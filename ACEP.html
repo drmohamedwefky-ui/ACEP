@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="pageTitle">Academic Center for Editing and Publishing (ACEP)</title>
+    <!-- Favicon using the uploaded logo -->
+    <link rel="icon" href="https://res.cloudinary.com/dtrqntpet/image/upload/v1751855913/Final_swogcx.png" type="image/png">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for social media icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Custom font for Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        /* For Arabic, Noto Sans Arabic is a good choice */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F8F8; /* Light gray background */
+        }
+        html[data-lang="ar"] body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            direction: rtl; /* Right-to-left for Arabic */
+        }
+        html[data-lang="ar"] .text-left { text-align: right; }
+        html[data-lang="ar"] .text-right { text-align: left; }
+        html[data-lang="ar"] .list-disc { list-style-position: inside; } /* Adjust list for RTL */
+
+        /* Custom colors based on the logo */
+        .text-navy-blue { color: #002366; }
+        .bg-navy-blue { background-color: #002366; }
+        .text-gold { color: #FFD700; }
+        .bg-gold { background-color: #FFD700; }
+        .border-gold { border-color: #FFD700; }
+        .hover-gold:hover { background-color: #FFD700; color: #002366; }
+        .hover-gold-text:hover { color: #FFD700; }
+
+        /* Hero Section Background Image */
+        .hero-section-bg {
+            background-image: url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* People collaborating */
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .hero-section-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 35, 102, 0.7); /* Dark overlay for text readability */
+            z-index: 1;
+        }
+        .hero-section-bg > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Interactive Service Cards */
+        .service-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+
+        /* Styles for the Chatbot */
+        .chatbot-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .chatbot-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .chatbot-container {
+            width: 90%;
+            max-width: 450px;
+            height: 600px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chatbot-header {
+            background-color: #002366;
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        .chatbot-close-btn:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .user-message {
+            background-color: #e0e7ff;
+            color: #002366;
+            padding: 10px 15px;
+            border-radius: 15px 15px 0 15px;
+            align-self: flex-end;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .ai-message {
+            background-color: #ffffff;
+            color: #333;
+            padding: 10px 15px;
+            border-radius: 15px 15px 15px 0;
+            align-self: flex-start;
+            max-width: 80%;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .loading-dots {
+            display: flex;
+            align-self: flex-start;
+            margin-left: 15px;
+        }
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background-color: #999;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            background-color: #fff;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+
+        .chat-send-btn {
+            background-color: #002366;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .chat-send-btn:hover {
+            background-color: #FFD700;
+            color: #002366;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="bg-white shadow-md py-4 px-6 md:px-12 sticky top-0 z-50">
+        <nav class="container mx-auto flex flex-col md:flex-row items-center justify-center md:gap-x-8">
+            <div class="flex items-center mb-4 md:mb-0">
+                <!-- Made the logo clickable to open in full size in a new tab -->
+                <a href="https://res.cloudinary.com/dtrqntpet/image/upload/v1751855913/Final_swogcx.png" target="_blank" class="mr-3">
+                    <img src="https://res.cloudinary.com/dtrqntpet/image/upload/v1751855913/Final_swogcx.png" alt="ACEP Logo" class="h-24 w-24 rounded-full">
+                </a>
+                <a href="#home" class="text-2xl font-bold text-navy-blue" data-translate="acepTitle">ACEP</a>
+            </div>
+            <ul class="flex flex-row justify-center items-center md:space-x-4 text-sm font-medium">
+                <li><a href="#home" class="text-navy-blue hover-gold-text transition duration-300 px-3 py-2 rounded-md" data-translate="navHome">Home</a></li>
+                <li><a href="#about" class="text-navy-blue hover-gold-text transition duration-300 px-3 py-2 rounded-md" data-translate="navAboutUs">About Us</a></li>
+                <li><a href="#services" class="text-navy-blue hover-gold-text transition duration-300 px-3 py-2 rounded-md" data-translate="navServices">Services</a></li>
+                <li><a href="#tools" class="text-navy-blue hover-gold-text transition duration-300 px-3 py-2 rounded-md" data-translate="navTools">Tools</a></li>
+                <li><a href="#contact" class="text-navy-blue hover-gold-text transition duration-300 px-3 py-2 rounded-md" data-translate="navContact">Contact</a></li>
+                <li><button id="openChatbotBtn" class="bg-navy-blue text-white font-semibold py-2 px-4 rounded-full text-sm shadow-md hover-gold transition duration-300 transform hover:scale-105" data-translate="navChatWithUs">Chat with Us</button></li>
+                <li>
+                    <select id="languageSelector" class="bg-gold text-navy-blue font-semibold py-2 px-4 rounded-full text-sm shadow-md hover:bg-navy-blue hover:text-white transition duration-300 transform hover:scale-105 cursor-pointer appearance-none">
+                        <option value="en" data-translate="langOptionEnglish">English</option>
+                        <option value="ar" data-translate="langOptionArabic">العربية</option>
+                    </select>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section-bg text-white py-20 md:py-32 text-center">
+        <div class="container mx-auto px-6 relative z-20">
+            <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6" data-translate="heroTitle">
+                Academic Center for Editing and Publishing
+            </h1>
+            <p class="text-xl md:text-2xl font-light mb-10 text-gold" data-translate="heroSubtitle">
+                Empowering Research Excellence
+            </p>
+            <a href="#services" class="bg-gold text-navy-blue font-semibold py-4 px-8 rounded-full text-lg shadow-lg hover:bg-white transition duration-300 transform hover:scale-105" data-translate="heroButton">
+                Explore Our Services
+            </a>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="py-16 md:py-24 bg-white">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-navy-blue text-center mb-10" data-translate="aboutUsTitle">About ACEP</h2>
+            <div class="text-lg leading-relaxed text-gray-700 space-y-6">
+                <div class="flex flex-col md:flex-row items-center md:items-start md:space-x-8">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Team collaborating on research" class="w-full md:w-1/2 lg:w-2/5 object-cover rounded-lg shadow-md mb-6 md:mb-0 md:float-left md:mr-8">
+                    <div data-translate="aboutUsContent" data-is-html="true">
+                        <p>
+                            The Academic Center for Editing and Publishing (ACEP) is dedicated to elevating the quality and impact of academic work across various disciplines. We understand the rigorous demands of scholarly communication and are committed to providing unparalleled support to our diverse clientele.
+                        </p>
+                        <p>
+                            Our team comprises experienced editors, proofreaders, and publishing specialists with deep expertise in academic writing conventions, citation styles, and journal requirements. We partner with students, researchers, faculty, journals, and publishers to ensure their work is clear, concise, coherent, and meets the highest academic standards.
+                        </p>
+                        <p>
+                            At ACEP, we believe that well-edited and professionally presented research is crucial for effective knowledge dissemination and career advancement. Let us be your trusted partner in achieving academic excellence.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Executive Manager Section -->
+            <div class="mt-16 pt-10 border-t border-gray-200">
+                <h3 class="text-2xl md:text-3xl font-bold text-navy-blue text-center mb-8" data-translate="executiveManagerTitle">Executive Manager</h3>
+                <div class="flex flex-col md:flex-row items-center md:items-start md:space-x-8">
+                    <div class="flex-shrink-0 mb-6 md:mb-0">
+                        <!-- IMPORTANT: Please upload your actual profile picture for Prof. Mohamed El-Sherif to the platform and replace this URL. -->
+                        <img src="https://res.cloudinary.com/dtrqntpet/image/upload/v1751857047/ChatGPT_Image_Jul_7_2025_05_55_55_AM_yj9ir3.png" alt="Professional portrait of Executive Manager, Prof. Mohamed El-Sherif" class="w-48 h-48 object-cover rounded-full shadow-lg border-4 border-gold">
+                    </div>
+                    <div class="flex-grow text-lg leading-relaxed text-gray-700" data-translate="executiveManagerBio" data-is-html="true">
+                        <p class="font-semibold text-xl text-navy-blue mb-2">Prof. Mohamed El-Sherif, Ph.D.</p>
+                        <p class="mb-4">
+                            Prof. Mohamed El-Sherif is a distinguished Full Professor at the Department of Surgery, Faculty of Veterinary Medicine, New Valley University. With a profound academic background and extensive experience in scholarly communication, he brings a unique blend of practical expertise and academic rigor to ACEP.
+                        </p>
+                        <p class="mb-4">
+                            Holding a Ph.D. in Veterinary Surgery from Damanhour University, Prof. El-Sherif has dedicated years to teaching Animal Surgery, Anesthesia, and Diagnostic Imaging Techniques to both undergraduate and postgraduate students. His career spans various esteemed academic and research roles, including Associate and Assistant Professor positions, and a significant tenure as a researcher and veterinarian.
+                        </p>
+                        <p>
+                            Beyond his teaching and research, Prof. El-Sherif's commitment to academic excellence is further demonstrated by his role as a Managing Editor for the New Valley Veterinary Journal (NVVJ) and his previous chairmanship of the Research Ethics Committee at New Valley University. His deep understanding of research integrity, publication standards, and the nuances of academic writing ensures that ACEP is led by an individual truly dedicated to empowering research excellence.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Editorial Section -->
+            <div class="mt-16 pt-10 border-t border-gray-200">
+                <h3 class="text-2xl md:text-3xl font-bold text-navy-blue text-center mb-8" data-translate="editorialTitle">Editorial Team</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8" id="editorialContainer">
+                    <!-- Editorial members will be populated here by JavaScript -->
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-16 md:py-24 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-navy-blue text-center mb-12" data-translate="servicesTitle">Our Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Service Cards will be populated here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section id="tools" class="py-16 md:py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-navy-blue text-center mb-12" data-translate="toolsTitle">Academic Tools</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" id="toolsContainer">
+                <!-- Tool Cards will be populated here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- VetPro Solutions Advertisement Section -->
+    <section class="bg-navy-blue text-white py-12 px-6 text-center">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold mb-6">Need Comprehensive Veterinary Services?</h2>
+            <p class="text-lg mb-8">Explore our sister site, VetPro Solutions, for expert animal health and professional development!</p>
+            <a href="https://vetpro-solutions-placeholder.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center bg-white text-navy-blue font-semibold py-3 px-8 rounded-full text-lg shadow-lg hover:bg-gold hover:text-navy-blue transition duration-300 transform hover:scale-105">
+                <img src="https://res.cloudinary.com/dtrqntpet/image/upload/v1752015688/1_jkhebo.png" alt="VetPro Solutions Logo" class="h-10 w-10 rounded-full mr-3">
+                Visit VetPro Solutions
+            </a>
+        </div>
+    </section>
+
+    <!-- Contact Us Section -->
+    <section id="contact" class="py-16 md:py-24 bg-white">
+        <div class="container mx-auto px-6 max-w-2xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-navy-blue text-center mb-10" data-translate="contactUsTitle">Contact Us</h2>
+            <p class="text-lg text-gray-700 text-center mb-8" data-translate="contactUsSubtitle">
+                Have a question or need a quote? Fill out the form below and we'll get back to you shortly.
+            </p>
+            <!-- Formspree integration for sending emails -->
+            <form id="contactForm" class="bg-gray-100 p-8 rounded-lg shadow-lg" action="https://formspree.io/f/movwzblo" method="POST">
+                <div id="form-result" class="mb-4"></div>
+                <div class="mb-6">
+                    <label for="name" class="block text-navy-blue text-lg font-medium mb-2" data-translate="formNameLabel">Your Name</label>
+                    <input type="text" id="name" name="name" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold" placeholder="John Doe" required data-translate-placeholder="formNamePlaceholder">
+                </div>
+                <div class="mb-6">
+                    <label for="email" class="block text-navy-blue text-lg font-medium mb-2" data-translate="formEmailLabel">Your Email</label>
+                    <input type="email" id="email" name="email" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold" placeholder="john.doe@example.com" required data-translate-placeholder="formEmailPlaceholder">
+                </div>
+                <div class="mb-6">
+                    <label for="service" class="block text-navy-blue text-lg font-medium mb-2" data-translate="formServiceLabel">Service of Interest</label>
+                    <select id="service" name="service" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold" required>
+                        <option value="" data-translate="formServiceOptionDefault">-- Select a Service --</option>
+                        <option value="students" data-translate="serviceStudentsTitle">For Students</option>
+                        <option value="researchers" data-translate="serviceResearchersTitle">For Researchers</option>
+                        <option value="faculty" data-translate="serviceFacultyTitle">For Faculty & Academics</option>
+                        <option value="journals" data-translate="serviceJournalsTitle">For Journals & Publishers</option>
+                        <option value="institutions" data-translate="serviceInstitutionsTitle">For Institutions & Organizations</option>
+                        <option value="english-editing" data-translate="serviceEnglishEditingTitle">English Editing</option>
+                        <option value="translation" data-translate="serviceTranslationTitle">Translation</option>
+                        <option value="plagiarism-check" data-translate="servicePlagiarismCheckTitle">Plagiarism Check</option>
+                        <option value="other" data-translate="serviceOtherTitle">Other Academic Support</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label for="message" class="block text-navy-blue text-lg font-medium mb-2" data-translate="formMessageLabel">Your Message</label>
+                    <textarea id="message" name="message" rows="6" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Tell us about your project or inquiry..." required data-translate-placeholder="formMessagePlaceholder"></textarea>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="bg-navy-blue text-white font-semibold py-3 px-8 rounded-full text-lg shadow-lg hover-gold transition duration-300 transform hover:scale-105" data-translate="formSendButton">
+                        Send Message
+                    </button>
+                </div>
+            </form>
+            <div class="mt-12 text-center text-lg text-gray-700 space-y-4">
+                <p class="flex items-center justify-center">
+                    <i class="fas fa-phone text-navy-blue mr-2"></i>
+                    <span data-translate="contactTel">Tel:</span> <a href="tel:+201021799726" class="text-navy-blue hover-gold-text ml-2">+201021799726</a>
+                </p>
+                <p class="flex items-center justify-center">
+                    <i class="fab fa-whatsapp text-navy-blue mr-2"></i>
+                    <span data-translate="contactWhatsApp">WhatsApp:</span> <a href="https://wa.me/201021799726" target="_blank" class="text-navy-blue hover-gold-text ml-2">+201021799726</a>
+                </p>
+                <p class="flex items-center justify-center">
+                    <i class="fas fa-envelope text-navy-blue mr-2"></i>
+                    <span data-translate="contactEmail">Email:</span> <a href="mailto:ACEP_EG@outlook.com" class="text-navy-blue hover-gold-text ml-2">ACEP_EG@outlook.com</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-navy-blue text-white py-8 px-6 text-center">
+        <div class="container mx-auto">
+            <p class="mb-4" data-translate="footerCopyright">&copy; 2025 Academic Center for Editing and Publishing (ACEP). All rights reserved.</p>
+            <div class="flex justify-center space-x-6 text-2xl">
+                <a href="#" class="hover-gold-text transition duration-300" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover-gold-text transition duration-300" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover-gold-text transition duration-300" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <p class="mt-4 text-sm" data-translate="footerTagline">Empowering Research Excellence</p>
+        </div>
+    </footer>
+
+    <!-- AI Chatbot Overlay -->
+    <div id="chatbotOverlay" class="chatbot-overlay">
+        <div class="chatbot-container">
+            <div class="chatbot-header">
+                <i class="fas fa-robot text-white mr-2 text-xl"></i> <span data-translate="chatbotTitle">ACEP Assistant</span>
+                <button id="closeChatbotBtn" class="chatbot-close-btn">&times;</button>
+            </div>
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Type your message..." data-translate-placeholder="chatbotInputPlaceholder">
+                <button id="chatSendBtn" class="chat-send-btn" data-translate="chatbotSendButton">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Translation Data ---
+            const translations = {
+                en: {
+                    pageTitle: "Academic Center for Editing and Publishing (ACEP)",
+                    acepTitle: "ACEP",
+                    navHome: "Home",
+                    navAboutUs: "About Us",
+                    navServices: "Services",
+                    navTools: "Tools",
+                    navContact: "Contact",
+                    navChatWithUs: "Chat with Us",
+                    langOptionEnglish: "English",
+                    langOptionArabic: "العربية",
+                    heroTitle: "Academic Center for Editing and Publishing",
+                    heroSubtitle: "Empowering Research Excellence",
+                    heroButton: "Explore Our Services",
+                    aboutUsTitle: "About ACEP",
+                    aboutUsContent: `
+                        <p>
+                            The Academic Center for Editing and Publishing (ACEP) is dedicated to elevating the quality and impact of academic work across various disciplines. We understand the rigorous demands of scholarly communication and are committed to providing unparalleled support to our diverse clientele.
+                        </p>
+                        <p>
+                            Our team comprises experienced editors, proofreaders, and publishing specialists with deep expertise in academic writing conventions, citation styles, and journal requirements. We partner with students, researchers, faculty, journals, and publishers to ensure their work is clear, concise, coherent, and meets the highest academic standards.
+                        </p>
+                        <p>
+                            At ACEP, we believe that well-edited and professionally presented research is crucial for effective knowledge dissemination and career advancement. Let us be your trusted partner in achieving academic excellence.
+                        </p>
+                    `,
+                    executiveManagerTitle: "Executive Manager",
+                    executiveManagerBio: `
+                        <p class="font-semibold text-xl text-navy-blue mb-2">Prof. Mohamed El-Sherif, Ph.D.</p>
+                        <p class="mb-4">
+                            Prof. Mohamed El-Sherif is a distinguished Full Professor at the Department of Surgery, Faculty of Veterinary Medicine, New Valley University. With a profound academic background and extensive experience in scholarly communication, he brings a unique blend of practical expertise and academic rigor to ACEP.
+                        </p>
+                        <p class="mb-4">
+                            Holding a Ph.D. in Veterinary Surgery from Damanhour University, Prof. El-Sherif has dedicated years to teaching Animal Surgery, Anesthesia, and Diagnostic Imaging Techniques to both undergraduate and postgraduate students. His career spans various esteemed academic and research roles, including Associate and Assistant Professor positions, and a significant tenure as a researcher and veterinarian.
+                        </p>
+                        <p>
+                            Beyond his teaching and research, Prof. El-Sherif's commitment to academic excellence is further demonstrated by his role as a Managing Editor for the New Valley Veterinary Journal (NVVJ) and his previous chairmanship of the Research Ethics Committee at New Valley University. His deep understanding of research integrity, publication standards, and the nuances of academic writing ensures that ACEP is led by an individual truly dedicated to empowering research excellence.
+                        </p>
+                    `,
+                    editorialTitle: "Editorial Team", // New translation key
+                    servicesTitle: "Our Services",
+                    toolsTitle: "Academic Tools",
+                    toolPlagiarismXTitle: "Plagiarism Checker X",
+                    toolPlagiarismXDesc: "A comprehensive plagiarism detection software to ensure originality.",
+                    toolEndNoteTitle: "EndNote",
+                    toolEndNoteDesc: "Reference management software to save time formatting bibliographies.",
+                    toolMendeleyTitle: "Mendeley",
+                    toolMendeleyDesc: "A free reference manager and academic social network.",
+                    toolQuillbotTitle: "QuillBot",
+                    toolQuillbotDesc: "An AI writing and paraphrasing tool to enhance your writing.",
+                    contactUsTitle: "Contact Us",
+                    contactUsSubtitle: "Have a question or need a quote? Fill out the form below and we'll get back to you shortly.",
+                    formNameLabel: "Your Name",
+                    formNamePlaceholder: "John Doe",
+                    formEmailLabel: "Your Email",
+                    formEmailPlaceholder: "john.doe@example.com",
+                    formServiceLabel: "Service of Interest",
+                    formServiceOptionDefault: "-- Select a Service --",
+                    formMessageLabel: "Your Message",
+                    formMessagePlaceholder: "Tell us about your project or inquiry...",
+                    formSendButton: "Send Message",
+                    formSuccessMessage: "Thank you! Your message has been sent successfully. We will get back to you shortly.",
+                    formErrorMessage: "Sorry, something went wrong. Please try again later.",
+                    formSendingMessage: "Sending...",
+                    contactTel: "Tel:",
+                    contactWhatsApp: "WhatsApp:",
+                    contactEmail: "Email:",
+                    footerCopyright: "&copy; 2025 Academic Center for Editing and Publishing (ACEP). All rights reserved.",
+                    footerTagline: "Empowering Research Excellence",
+                    chatbotTitle: "ACEP Assistant",
+                    chatbotInitialMessage: "Hello! I'm your ACEP Assistant. How can I help you today? Feel free to ask about our services or how to get started.",
+                    chatbotInputPlaceholder: "Type your message...",
+                    chatbotSendButton: "Send",
+                    chatbotErrorMessage1: "Sorry, I couldn't get a response. Please try again.",
+                    chatbotErrorMessage2: "There was an error connecting to the AI. Please try again later.",
+                    learnMore: "Learn More",
+                    showLess: "Show Less"
+                },
+                ar: {
+                    pageTitle: "المركز الأكاديمي للتحرير والنشر (ACEP)",
+                    acepTitle: "ACEP",
+                    navHome: "الرئيسية",
+                    navAboutUs: "عنا",
+                    navServices: "خدماتنا",
+                    navTools: "الأدوات",
+                    navContact: "اتصل بنا",
+                    navChatWithUs: "تحدث معنا",
+                    langOptionEnglish: "English",
+                    langOptionArabic: "العربية",
+                    heroTitle: "المركز الأكاديمي للتحرير والنشر",
+                    heroSubtitle: "تمكين التميز البحثي",
+                    heroButton: "استكشف خدماتنا",
+                    aboutUsTitle: "عن ACEP",
+                    aboutUsContent: `
+                        <p>
+                            المركز الأكاديمي للتحرير والنشر (ACEP) مكرس لرفع جودة وتأثير الأعمال الأكاديمية عبر مختلف التخصصات. نحن نتفهم المتطلبات الصارمة للتواصل العلمي ونلتزم بتقديم دعم لا مثيل له لعملائنا المتنوعين.
+                        </p>
+                        <p>
+                            يتكون فريقنا من محررين ومدققين لغويين ومتخصصين في النشر ذوي خبرة عميقة في اتفاقيات الكتابة الأكاديمية وأنماط الاستشهاد ومتطلبات المجلات. نتعاون مع الطلاب والباحثين وأعضاء هيئة التدريس والمجلات والناشرين لضمان أن تكون أعمالهم واضحة وموجزة ومتماسكة وتلبي أعلى المعايير الأكاديمية.
+                        </p>
+                        <p>
+                            في ACEP، نؤمن بأن البحث المحرر جيدًا والمقدم باحترافية أمر بالغ الأهمية لنشر المعرفة الفعال والتقدم الوظيفي. دعنا نكون شريكك الموثوق به في تحقيق التميز الأكاديمي.
+                        </p>
+                    `,
+                    executiveManagerTitle: "المدير التنفيذي",
+                    executiveManagerBio: `
+                        <p class="font-semibold text-xl text-navy-blue mb-2">الأستاذ الدكتور محمد الشريف، دكتوراه</p>
+                        <p class="mb-4">
+                            الأستاذ الدكتور محمد الشريف هو أستاذ متفرغ متميز بقسم الجراحة، كلية الطب البيطري، جامعة الوادي الجديد. بفضل خلفيته الأكاديمية العميقة وخبرته الواسعة في التواصل العلمي، يقدم مزيجًا فريدًا من الخبرة العملية والدقة الأكاديمية إلى ACEP.
+                        </p>
+                        <p class="mb-4">
+                            حاصل على درجة الدكتوراه في الجراحة البيطرية من جامعة دمنهور، وقد كرس الأستاذ الدكتور الشريف سنوات لتدريس مقررات جراحة الحيوان والتخدير وتقنيات التصوير التشخيصي لطلاب البكالوريوس والدراسات العليا. تمتد مسيرته المهنية عبر العديد من الأدوار الأكاديمية والبحثية المرموقة، بما في ذلك مناصب أستاذ مشارك ومساعد، وفترة عمل طويلة كباحث وطبيب بيطري.
+                        </p>
+                        <p>
+                            بالإضافة إلى تدريسه وبحثه، يتجلى التزام الأستاذ الدكتور الشريف بالتميز الأكاديمي بشكل أكبر من خلال دوره كمحرر إداري لمجلة الوادي الجديد البيطرية (NVVJ) ورئاسته السابقة للجنة أخلاقيات البحث العلمي بجامعة الوادي الجديد. يضمن فهمه العميق لنزاهة البحث ومعايير النشر ودقائق الكتابة الأكاديمية أن ACEP يقودها فرد مكرس حقًا لتمكين التميز البحثي.
+                        </p>
+                    `,
+                    editorialTitle: "الفريق التحريري", // New translation key
+                    servicesTitle: "خدماتنا",
+                    toolsTitle: "الأدوات الأكاديمية",
+                    toolPlagiarismXTitle: "مدقق الانتحال X",
+                    toolPlagiarismXDesc: "برنامج شامل للكشف عن الانتحال لضمان الأصالة.",
+                    toolEndNoteTitle: "إند نوت",
+                    toolEndNoteDesc: "برنامج إدارة المراجع لتوفير الوقت في تنسيق المراجع.",
+                    toolMendeleyTitle: "مندلي",
+                    toolMendeleyDesc: "مدير مراجع مجاني وشبكة اجتماعية أكاديمية.",
+                    toolQuillbotTitle: "كويل بوت",
+                    toolQuillbotDesc: "أداة كتابة وإعادة صياغة بالذكاء الاصطناعي لتحسين كتاباتك.",
+                    contactUsTitle: "اتصل بنا",
+                    contactUsSubtitle: "هل لديك سؤال أو تحتاج إلى عرض أسعار؟ املأ النموذج أدناه وسنعاود الاتصال بك قريبًا.",
+                    formNameLabel: "اسمك",
+                    formNamePlaceholder: "جون دو",
+                    formEmailLabel: "بريدك الإلكتروني",
+                    formEmailPlaceholder: "john.doe@example.com",
+                    formServiceLabel: "الخدمة المطلوبة",
+                    formServiceOptionDefault: "-- اختر خدمة --",
+                    formMessageLabel: "رسالتك",
+                    formMessagePlaceholder: "أخبرنا عن مشروعك أو استفسارك...",
+                    formSendButton: "إرسال",
+                    formSuccessMessage: "شكرًا لك! تم إرسال رسالتك بنجاح. سنعاود الاتصال بك قريبًا.",
+                    formErrorMessage: "عذرًا، حدث خطأ ما. يرجى المحاولة مرة أخرى لاحقًا.",
+                    formSendingMessage: "جار الإرسال...",
+                    contactTel: "هاتف:",
+                    contactWhatsApp: "واتساب:",
+                    contactEmail: "بريد إلكتروني:",
+                    footerCopyright: "&copy; 2025 المركز الأكاديمي للتحرير والنشر (ACEP). جميع الحقوق محفوظة.",
+                    footerTagline: "تمكين التميز البحثي",
+                    chatbotTitle: "مساعد ACEP",
+                    chatbotInitialMessage: "مرحباً! أنا مساعد ACEP الخاص بك. كيف يمكنني مساعدتك اليوم؟ لا تتردد في السؤال عن خدماتنا أو كيفية البدء.",
+                    chatbotInputPlaceholder: "اكتب رسالتك...",
+                    chatbotSendButton: "إرسال",
+                    chatbotErrorMessage1: "عذرًا، لم أتمكن من الحصول على رد. الرجاء المحاولة مرة أخرى.",
+                    chatbotErrorMessage2: "حدث خطأ في الاتصال بالذكاء الاصطناعي. الرجاء المحاولة مرة أخرى لاحقًا.",
+                    learnMore: "اعرف المزيد",
+                    showLess: "عرض أقل"
+                }
+            };
+            
+            // --- Services Data ---
+            const servicesData = {
+                en: [
+                    { id: "students", title: "For Students", desc: "Comprehensive editing and proofreading for theses, dissertations, essays, and assignments. We help you refine your academic voice and ensure clarity.", items: ["Thesis & Dissertation Editing", "Essay & Assignment Proofreading", "Citation & Referencing Checks", "Plagiarism Review & Guidance"] },
+                    { id: "researchers", title: "For Researchers", desc: "Expert support for research papers, grant proposals, and conference proceedings, ensuring your findings are presented with precision and impact.", items: ["Research Paper Editing", "Grant Proposal Review", "Conference Abstract Polishing", "Data Presentation Enhancement"] },
+                    { id: "faculty", title: "For Faculty & Academics", desc: "Specialized editing for scholarly articles, book chapters, and academic books, maintaining your distinctive voice while ensuring academic rigor.", items: ["Journal Article Editing", "Book Chapter Review", "Academic Book Manuscript Editing", "Peer Review Response Assistance"] },
+                    { id: "journals", title: "For Journals & Publishers", desc: "Reliable and consistent editing services to maintain the high standards of your publications and streamline your editorial workflow.", items: ["Manuscript Preparation", "Copyediting & Proofreading", "Style Guide Adherence", "Pre-publication Checks"] },
+                    { id: "institutions", title: "For Institutions & Organizations", desc: "Tailored solutions for institutional reports, white papers, and academic publications, ensuring professional and impactful communication.", items: ["Annual Report Editing", "Policy Document Review", "Research Report Formatting", "Internal Communication Editing"] },
+                    { id: "english-editing", title: "English Editing", desc: "Professional English editing services to enhance clarity, grammar, and style for non-native English speakers.", items: ["Grammar and Punctuation Correction", "Syntax and Sentence Structure Improvement", "Clarity and Cohesion Enhancement", "Academic Tone Adjustment"] },
+                    { id: "translation", title: "Translation", desc: "Accurate and culturally sensitive translation services for academic and scientific documents.", items: ["Document Translation (Arabic to English and vice versa)", "Abstract Translation", "Manuscript Translation", "Certified Translation (upon request)"] },
+                    { id: "plagiarism-check", title: "Plagiarism Check", desc: "Thorough plagiarism detection and reporting to ensure the originality and integrity of your work.", items: ["Plagiarism Report Generation", "Similarity Index Analysis", "Guidance on Paraphrasing and Citation", "Originality Assurance"] },
+                    { id: "other", title: "Other Academic Support", desc: "Beyond core editing, we offer specialized assistance to enhance your academic journey and publishing success.", items: ["Academic Coaching", "Publication Strategy", "Research Dissemination Advice", "Workshop & Training Development"] }
+                ],
+                ar: [
+                    { id: "students", title: "للطلاب", desc: "تحرير وتدقيق لغوي شامل للرسائل الجامعية والأطروحات والمقالات والواجبات. نساعدك على صقل صوتك الأكاديمي وضمان الوضوح.", items: ["تحرير الرسائل والأطروحات", "تدقيق المقالات والواجبات", "فحص الاقتباسات والمراجع", "مراجعة الانتحال وتقديم الإرشادات"] },
+                    { id: "researchers", title: "للباحثين", desc: "دعم متخصص للأوراق البحثية ومقترحات المنح ووقائع المؤتمرات، مما يضمن تقديم نتائجك بدقة وتأثير.", items: ["تحرير الأوراق البحثية", "مراجعة مقترحات المنح", "صقل ملخصات المؤتمرات", "تحسين عرض البيانات"] },
+                    { id: "faculty", title: "لأعضاء هيئة التدريس والأكاديميين", desc: "تحرير متخصص للمقالات العلمية وفصول الكتب والكتب الأكاديمية، مع الحفاظ على صوتك المميز وضمان الدقة الأكاديمية.", items: ["تحرير المقالات البحثية", "مراجعة فصول الكتب", "تحرير مخطوطات الكتب الأكاديمية", "المساعدة في الرد على مراجعات الأقران"] },
+                    { id: "journals", title: "للمجلات والناشرين", desc: "خدمات تحرير موثوقة ومتسقة للحفاظ على المعايير العالية لمنشوراتك وتبسيط سير عمل التحرير.", items: ["إعداد المخطوطات", "التدقيق اللغوي والمراجعة", "الالتزام بدليل الأسلوب", "فحوصات ما قبل النشر"] },
+                    { id: "institutions", title: "للمؤسسات والمنظمات", desc: "حلول مخصصة للتقارير المؤسسية والأوراق البيضاء والمنشورات الأكاديمية، مما يضمن التواصل الاحترافي والمؤثر.", items: ["تحرير التقارير السنوية", "مراجعة وثائق السياسات", "تنسيق تقارير البحث", "التحرير الاتصالات الداخلية"] },
+                    { id: "english-editing", title: "تحرير اللغة الإنجليزية", desc: "خدمات تحرير احترافية للغة الإنجليزية لتعزيز الوضوح والقواعد والأسلوب للمتحدثين غير الأصليين للغة الإنجليزية.", items: ["تصحيح القواعد وعلامات الترقيم", "تحسين بناء الجملة وتركيبها", "تعزيز الوضوح والتماسك", "تعديل النبرة الأكاديمية"] },
+                    { id: "translation", title: "الترجمة", desc: "خدمات ترجمة دقيقة وحساسة ثقافياً للمستندات الأكاديمية والعلمية.", items: ["ترجمة المستندات (من العربية إلى الإنجليزية والعكس)", "ترجمة الملخصات", "ترجمة المخطوطات", "ترجمة معتمدة (عند الطلب)"] },
+                    { id: "plagiarism-check", title: "فحص الانتحال", desc: "كشف الانتحال والإبلاغ عنه بدقة لضمان أصالة عملك وسلامته.", items: ["إنشاء تقرير الانتحال", "تحليل مؤشر التشابه", "إرشادات حول إعادة الصياغة والاقتباس", "ضمان الأصالة"] },
+                    { id: "other", title: "دعم أكاديمي آخر", desc: "بالإضافة إلى التحرير الأساسي، نقدم مساعدة متخصصة لتعزيز رحلتك الأكاديمية ونجاحك في النشر.", items: ["التوجيه الأكاديمي", "استراتيجية النشر", "نصائح نشر الأبحاث", "تطوير ورش العمل والتدريب"] }
+                ]
+            };
+            
+            // --- Tools Data ---
+            const toolsData = {
+                en: [
+                    { id: "plagiarism-checker-x", title: "Plagiarism Checker X", desc: "A comprehensive plagiarism detection software to ensure originality.", logo: "https://res.cloudinary.com/dtrqntpet/image/upload/v1752016090/plag_oqtdbe.jpg", link: "https://plagiarismcheckerx.com/" },
+                    { id: "endnote", title: "EndNote", desc: "Reference management software to save time formatting bibliographies.", logo: "https://res.cloudinary.com/dtrqntpet/image/upload/v1752019442/EndNote_eznqie.png", link: "https://endnote.com/" },
+                    { id: "mendeley", title: "Mendeley", desc: "A free reference manager and academic social network.", logo: "https://res.cloudinary.com/dtrqntpet/image/upload/v1752019738/mendeley_sqpjms.jpg", link: "https://www.mendeley.com/" },
+                    { id: "quillbot", title: "QuillBot", desc: "An AI writing and paraphrasing tool to enhance your writing.", logo: "https://res.cloudinary.com/dtrqntpet/image/upload/v1752019476/quillbot_y8mqzz.png", link: "https://quillbot.com/" }
+                ],
+                ar: [
+                    { id: "plagiarism-checker-x", title: "مدقق الانتحال X", desc: "برنامج شامل للكشف عن الانتحال لضمان الأصالة.", logo: "https://res.cloudinary.com/dtrqntpet/image/upload/v1752016090/plag_oqtdbe.jpg", link: "https://plagiarismcheckerx.com/" },
+                    { id: "endnote", title: "إند نوت", desc: "برنامج إدارة المراجع لتوفير الوقت في تنسيق المراجع.", logo: "https://res.cloudinary.com/dtrqntpet/image/upload/v1752019442/EndNote_eznqie.png", link: "https://endnote.com/" },
+                    { id: "mendeley", title: "مندلي", desc: "مدير مراجع مجاني وشبكة اجتماعية أكاديمية.", logo: "https://res.cloudinary.com/dtrqntpet/image/upload/v1752019738/mendeley_sqpjms.jpg", link: "https://www.mendeley.com/" },
+                    { id: "quillbot", title: "كويل بوت", desc: "أداة كتابة وإعادة صياغة بالذكاء الاصطناعي لتحسين كتاباتك.", logo: "https://res.cloudinary.com/dtrqntpet/image/upload/v1752019476/quillbot_y8mqzz.png", link: "https://quillbot.com/" }
+                ]
+            };
+
+            // --- Editorial Data ---
+            const editorialData = {
+                en: [
+                    { name: "Dr. Elsaid Saafan", affiliation: "Animal Health Research Center", photo: "https://res.cloudinary.com/dtrqntpet/image/upload/v1751857475/WhatsApp-Image-2023-02-21-at-12.23.18-AM_1_jmuozu.jpg" },
+                    { name: "Dr. Sara Ali", affiliation: "Alexandria University", photo: "https://placehold.co/150x150/002366/FFD700?text=Editor+2" },
+                    { name: "Dr. Omar Mahmoud", affiliation: "Ain Shams University", photo: "https://placehold.co/150x150/002366/FFD700?text=Editor+3" },
+                    { name: "Dr. Fatima Zahra", affiliation: "Mansoura University", photo: "https://placehold.co/150x150/002366/FFD700?text=Editor+4" },
+                    { name: "Dr. Khaled Ibrahim", affiliation: "Assiut University", photo: "https://placehold.co/150x150/002366/FFD700?text=Editor+5" },
+                    { name: "Dr. Mona Gad", affiliation: "Tanta University", photo: "https://placehold.co/150x150/002366/FFD700?text=Editor+6" }
+                ],
+                ar: [
+                    { name: "د. السيد سعفان", affiliation: "مركز بحوث صحة الحيوان", photo: "https://res.cloudinary.com/dtrqntpet/image/upload/v1751857475/WhatsApp-Image-2023-02-21-at-12.23.18-AM_1_jmuozu.jpg" },
+                    { name: "د. سارة علي", affiliation: "جامعة الإسكندرية", photo: "https://placehold.co/150x150/002366/FFD700?text=محرر+2" },
+                    { name: "د. عمر محمود", affiliation: "جامعة عين شمس", photo: "https://placehold.co/150x150/002366/FFD700?text=محرر+3" },
+                    { name: "د. فاطمة الزهراء", affiliation: "جامعة المنصورة", photo: "https://placehold.co/150x150/002366/FFD700?text=محرر+4" },
+                    { name: "د. خالد إبراهيم", affiliation: "جامعة أسيوط", photo: "https://placehold.co/150x150/002366/FFD700?text=محرر+5" },
+                    { name: "د. منى جاد", affiliation: "جامعة طنطا", photo: "https://placehold.co/150x150/002366/FFD700?text=محرر+6" }
+                ]
+            };
+            
+            const htmlElement = document.documentElement;
+            const languageSelector = document.getElementById('languageSelector');
+            const servicesContainer = document.querySelector('#services .grid');
+            const toolsContainer = document.getElementById('toolsContainer');
+            const editorialContainer = document.getElementById('editorialContainer'); // Get the new container
+
+            // --- Core Functions ---
+            const updateContent = () => {
+                const lang = htmlElement.getAttribute('data-lang') || 'en';
+                const currentTranslations = translations[lang];
+
+                document.querySelectorAll('[data-translate]').forEach(element => {
+                    const key = element.getAttribute('data-translate');
+                    if (currentTranslations[key]) {
+                        if (element.dataset.isHtml) {
+                           element.innerHTML = currentTranslations[key];
+                        } else {
+                           element.textContent = currentTranslations[key];
+                        }
+                    }
+                });
+
+                document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+                    const key = element.getAttribute('data-translate-placeholder');
+                    if (currentTranslations[key]) {
+                        element.placeholder = currentTranslations[key];
+                    }
+                });
+
+                document.querySelectorAll('#service option').forEach(option => {
+                    const key = option.getAttribute('data-translate');
+                    if (currentTranslations[key]) {
+                        option.textContent = currentTranslations[key];
+                    }
+                });
+
+                languageSelector.value = lang;
+                renderServices();
+                renderTools();
+                renderEditorialMembers(); // Call the new rendering function
+            };
+
+            const switchLanguage = () => {
+                const newLang = languageSelector.value;
+                htmlElement.setAttribute('data-lang', newLang);
+                updateContent();
+                initializeChatbot(); 
+            };
+            
+            // --- Service Cards Logic ---
+            const renderServices = () => {
+                const lang = htmlElement.getAttribute('data-lang') || 'en';
+                const currentServices = servicesData[lang];
+                const learnMoreText = translations[lang].learnMore;
+                servicesContainer.innerHTML = '';
+                
+                currentServices.forEach(service => {
+                    const card = document.createElement('div');
+                    card.className = 'service-card bg-white rounded-lg shadow-lg p-8 transform hover:scale-105 transition duration-300 border-t-4 border-gold flex flex-col cursor-pointer';
+                    card.innerHTML = `
+                        <h3 class="text-2xl font-semibold text-navy-blue mb-4">${service.title}</h3>
+                        <p class="text-gray-700 mb-4 flex-grow">${service.desc}</p>
+                        <div class="service-details">
+                            <ul class="list-disc list-inside text-gray-600 space-y-2 mt-4">
+                                ${service.items.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <button class="learn-more-btn mt-4 text-navy-blue font-semibold self-start">${learnMoreText} <i class="fas fa-chevron-down ml-1 transition-transform"></i></button>
+                    `;
+                    servicesContainer.appendChild(card);
+                });
+            };
+
+            servicesContainer.addEventListener('click', (e) => {
+                const card = e.target.closest('.service-card');
+                if (card) {
+                    const details = card.querySelector('.service-details');
+                    const button = card.querySelector('.learn-more-btn');
+                    const icon = card.querySelector('.fa-chevron-down');
+                    const isExpanded = details.style.maxHeight;
+
+                    if (isExpanded && isExpanded !== '0px') {
+                        details.style.maxHeight = '0px';
+                        const lang = htmlElement.getAttribute('data-lang') || 'en';
+                        button.innerHTML = `${translations[lang].learnMore} <i class="fas fa-chevron-down ml-1 transition-transform"></i>`;
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        document.querySelectorAll('.service-details').forEach(d => d.style.maxHeight = '0px');
+                        document.querySelectorAll('.learn-more-btn').forEach(b => {
+                            const lang = htmlElement.getAttribute('data-lang') || 'en';
+                            b.innerHTML = `${translations[lang].learnMore} <i class="fas fa-chevron-down ml-1 transition-transform"></i>`;
+                            b.querySelector('i').style.transform = 'rotate(0deg)';
+                        });
+                        
+                        details.style.maxHeight = details.scrollHeight + 'px';
+                        const lang = htmlElement.getAttribute('data-lang') || 'en';
+                        button.innerHTML = `${translations[lang].showLess} <i class="fas fa-chevron-down ml-1 transition-transform"></i>`;
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                }
+            });
+
+            // --- Tools Cards Logic ---
+            const renderTools = () => {
+                const lang = htmlElement.getAttribute('data-lang') || 'en';
+                const currentTools = toolsData[lang];
+                toolsContainer.innerHTML = '';
+
+                currentTools.forEach(tool => {
+                    const toolCard = document.createElement('div');
+                    toolCard.className = 'bg-white rounded-lg shadow-lg p-6 text-center transform hover:scale-105 transition duration-300 border-t-4 border-gold flex flex-col items-center';
+                    toolCard.innerHTML = `
+                        <img src="${tool.logo}" alt="${tool.title} Logo" class="w-24 h-24 object-contain mb-4 rounded-full border border-gray-200 p-2">
+                        <h3 class="text-xl font-semibold text-navy-blue mb-2">${tool.title}</h3>
+                        <p class="text-gray-700 text-sm mb-4 flex-grow">${tool.desc}</p>
+                        <a href="${tool.link}" target="_blank" rel="noopener noreferrer" class="bg-navy-blue text-white font-semibold py-2 px-4 rounded-full text-sm shadow-md hover-gold transition duration-300 transform hover:scale-105 mt-auto">
+                            Visit Site
+                        </a>
+                    `;
+                    toolsContainer.appendChild(toolCard);
+                });
+            };
+
+            // --- Editorial Members Logic ---
+            const renderEditorialMembers = () => {
+                const lang = htmlElement.getAttribute('data-lang') || 'en';
+                const currentEditorial = editorialData[lang];
+                editorialContainer.innerHTML = '';
+
+                currentEditorial.forEach(member => {
+                    const memberCard = document.createElement('div');
+                    memberCard.className = 'bg-white rounded-lg shadow-lg p-6 text-center transform hover:scale-105 transition duration-300 border-t-4 border-gold flex flex-col items-center';
+                    memberCard.innerHTML = `
+                        <img src="${member.photo}" alt="${member.name} Photo" class="w-32 h-32 object-cover rounded-full mb-4 border-4 border-navy-blue">
+                        <h3 class="text-xl font-semibold text-navy-blue mb-2">${member.name}</h3>
+                        <p class="text-gray-700 text-sm">${member.affiliation}</p>
+                    `;
+                    editorialContainer.appendChild(memberCard);
+                });
+            };
+
+            // --- Contact Form Logic ---
+            const contactForm = document.getElementById('contactForm');
+            // Remove the formResult element and its associated JavaScript logic
+            // as Formspree handles success/error messages directly.
+            // const formResult = document.getElementById('form-result'); // No longer needed
+
+            contactForm.addEventListener('submit', (e) => {
+                // No need to prevent default or handle messages via JS anymore
+                // Formspree will handle the submission and redirection
+                // The form will submit normally to the Formspree endpoint
+            });
+
+            // --- Chatbot Logic ---
+            const chatbotOverlay = document.getElementById('chatbotOverlay');
+            const openChatbotBtn = document.getElementById('openChatbotBtn');
+            const closeChatbotBtn = document.getElementById('closeChatbotBtn');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+            const chatSendBtn = document.getElementById('chatSendBtn');
+            let chatHistory = [];
+
+            const initializeChatbot = () => {
+                const lang = htmlElement.getAttribute('data-lang') || 'en';
+                const welcomeMessage = translations[lang].chatbotInitialMessage;
+                chatMessages.innerHTML = '';
+                chatHistory = [{ role: "model", parts: [{ text: welcomeMessage }] }];
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.classList.add('ai-message');
+                aiMessageDiv.textContent = welcomeMessage;
+                chatMessages.appendChild(aiMessageDiv);
+            };
+
+            openChatbotBtn.addEventListener('click', () => {
+                chatbotOverlay.classList.add('active');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+
+            closeChatbotBtn.addEventListener('click', () => chatbotOverlay.classList.remove('active'));
+
+            chatSendBtn.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+
+            async function sendMessage() {
+                const userMessageText = chatInput.value.trim();
+                if (userMessageText === '') return;
+
+                const userMessageDiv = document.createElement('div');
+                userMessageDiv.classList.add('user-message');
+                userMessageDiv.textContent = userMessageText;
+                chatMessages.appendChild(userMessageDiv);
+                chatInput.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                chatHistory.push({ role: "user", parts: [{ text: userMessageText }] });
+
+                const loadingDiv = document.createElement('div');
+                loadingDiv.classList.add('loading-dots');
+                loadingDiv.innerHTML = '<span></span><span></span><span></span>';
+                chatMessages.appendChild(loadingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                try {
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; // Provided by Canvas at runtime
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    chatMessages.removeChild(loadingDiv);
+
+                    if (result.candidates && result.candidates[0]?.content?.parts[0]?.text) {
+                        const aiResponseText = result.candidates[0].content.parts[0].text;
+                        chatHistory.push({ role: "model", parts: [{ text: aiResponseText }] });
+                        const aiMessageDiv = document.createElement('div');
+                        aiMessageDiv.classList.add('ai-message');
+                        aiMessageDiv.textContent = aiResponseText;
+                        chatMessages.appendChild(aiMessageDiv);
+                    } else {
+                        throw new Error("Invalid API response structure");
+                    }
+                } catch (error) {
+                    console.error("Error communicating with Gemini API:", error);
+                    if (chatMessages.contains(loadingDiv)) chatMessages.removeChild(loadingDiv);
+                    const lang = htmlElement.getAttribute('data-lang') || 'en';
+                    const errorMessage = translations[lang].chatbotErrorMessage2;
+                    const errorDiv = document.createElement('div');
+                    errorDiv.classList.add('ai-message');
+                    errorDiv.textContent = errorMessage;
+                    chatMessages.appendChild(errorDiv);
+                }
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // --- Initial Setup ---
+            languageSelector.addEventListener('change', switchLanguage);
+            initializeChatbot();
+            updateContent();
+
+        });
+    </script>
+</body>
+</html>
